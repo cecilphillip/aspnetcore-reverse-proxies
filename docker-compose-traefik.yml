@@ -1,0 +1,53 @@
+version: "3.7"
+
+services:
+  traefik.service:
+    image: traefik:2.2.1
+    container_name: traefik.service
+    restart: always
+    command:
+      - --api.dashboard=true
+      - --api.insecure=true
+      - --log.level=DEBUG
+      - --providers.docker=true
+      - --providers.docker.network=traefik.network
+      - --providers.docker.exposedByDefault=false
+      - --entryPoints.web.address=:80
+      - --entryPoints.secureweb.address=:443
+      - --metrics.prometheus=true
+      - --providers.providersthrottleduration=10
+    labels:
+      - traefik.enable=true
+      - traefik.port=8080
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080" # Web UI port
+    volumes:
+      #- ${PWD}/traefik.toml:/etc/traefik/traefik.toml
+      - /var/run/docker.sock:/var/run/docker.sock # So Traefik can listen to Docker events
+  simplecoreapi.service:
+    restart: always
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.simpleapi.entrypoints=web
+      - traefik.http.routers.simpleapi.rule=Host(`simpleapi.service`)
+      - traefik.http.routers.simpleapi.service=simpleapi
+      - traefik.http.services.simpleapi.loadbalancer.server.scheme=http
+      - traefik.http.services.simpleapi.loadbalancer.server.port=80
+      - traefik.http.routers.secureapi.entrypoints=secureweb
+      - traefik.http.routers.secureapi.tls=true
+      - traefik.http.routers.secureapi.rule=Host(`simpleapi.service`)
+      - traefik.http.routers.secureapi.service=secureapi
+      - traefik.http.services.secureapi.loadbalancer.server.scheme=http
+      - traefik.http.services.secureapi.loadbalancer.server.port=80
+
+    volumes:
+      - ~/.aspnet/https:/https:ro # local dev certificates
+networks:
+  default:
+    name: traefik.network
+    driver: bridge
