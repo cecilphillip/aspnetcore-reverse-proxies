@@ -4,7 +4,7 @@ services:
   traefik.service:
     image: traefik:2.2.1
     container_name: traefik.service
-    restart: always
+    restart: unless-stopped
     command:
       - --api.dashboard=true
       - --api.insecure=true
@@ -24,23 +24,26 @@ services:
       - "443:443"
       - "8080:8080" # Web UI port
     volumes:
-      #- ${PWD}/traefik.toml:/etc/traefik/traefik.toml
       - /var/run/docker.sock:/var/run/docker.sock # So Traefik can listen to Docker events
-  simplecoreapi.service:
-    restart: always
+  simplecoreapi.service:    
     build:
       context: ./api
       dockerfile: Dockerfile
     labels:
+      # Expose this containter to traefik
       - traefik.enable=true
+
+      # Define a service `simpleapi` and attach it to the `web` entrypoint
       - traefik.http.routers.simpleapi.entrypoints=web
       - traefik.http.routers.simpleapi.rule=Host(`simpleapi.service`)
       - traefik.http.routers.simpleapi.service=simpleapi
       - traefik.http.services.simpleapi.loadbalancer.server.scheme=http
       - traefik.http.services.simpleapi.loadbalancer.server.port=80
+
+      # Define a service `secureapi` and attach it to the `wesecurewebb` entrypoint
       - traefik.http.routers.secureapi.entrypoints=secureweb
       - traefik.http.routers.secureapi.tls=true
-      - traefik.http.routers.secureapi.rule=Host(`simpleapi.service`)
+      - traefik.http.routers.secureapi.rule=Host(`secureapi.service`)
       - traefik.http.routers.secureapi.service=secureapi
       - traefik.http.services.secureapi.loadbalancer.server.scheme=http
       - traefik.http.services.secureapi.loadbalancer.server.port=80

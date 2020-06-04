@@ -1,0 +1,23 @@
+version: "3.7"
+
+services:
+  haproxy.service:
+    image: haproxy:2.1.4
+    container_name: haproxy.service
+    restart: always
+    ports:
+      - "80:80"
+      - "81:81" # web ui port
+      - "443:443"
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+  simplecoreapi.service:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    volumes:
+      - ~/.aspnet/https:/https:ro # local dev certificates
+networks:
+  default:
+    name: haproxy.network
+    driver: bridge

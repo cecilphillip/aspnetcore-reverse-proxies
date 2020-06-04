@@ -1,27 +1,23 @@
 @host = http://localhost:5000
 @securehost = https://localhost:5001
 @traefikdash = http://localhost:8081
-@traefik = http://localhost
-@securetraefik = https://localhost
+@proxy = http://localhost
+@secureproxy = https://localhost
 
-### Base Request
+### Local API Root Request
 GET {{host}}
 Accept: application/json
 
-### API Request
+### Local API Path Request
 GET {{host}}/api
 Accept: application/json
 
-### traefik ping
-GET {{traefikdash}}/ping
-
-### API proxied through traefix
-GET {{traefik}}/api
+### API Request proxied through traefix container
+GET {{proxy}}/api
 Accept: application/json
 HOST: simpleapi.service
 
-
-### Secure API proxied through traefix
-GET {{securetraefik}}/api
+### API Request proxied through traefix w/ TLS termination
+GET {{secureproxy}}/api
 Accept: application/json
 HOST: simpleapi.service
