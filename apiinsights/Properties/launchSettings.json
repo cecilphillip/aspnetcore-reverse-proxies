@@ -1,14 +1,14 @@
 ﻿{
   "iisSettings": {
-    "windowsAuthentication": false, 
-    "anonymousAuthentication": true, 
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:55506",
-      "sslPort": 44324
+      "applicationUrl": "http://localhost:60749",
+      "sslPort": 44391
     }
   },
-  "profiles": {   
-    "api": {
+  "profiles": {
+    "apiinsights": {
       "commandName": "Project",
       "launchBrowser": false,
       "applicationUrl": "https://localhost:5001;http://localhost:5000",
