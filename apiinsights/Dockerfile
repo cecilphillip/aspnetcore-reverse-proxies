@@ -6,6 +6,7 @@ ENV ASPNETCORE_URLS=http://+:80;https://+:443 \
     ASPNETCORE_Kestrel__Certificates__Default__Path=/https/demo.pfx
 
 EXPOSE 80
+EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
 WORKDIR /src
