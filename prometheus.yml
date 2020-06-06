@@ -1,0 +1,33 @@
+scrape_configs:
+  # Scape product service API
+  - job_name: "apiinsights"
+    metrics_path: /prometheus
+    scrape_interval: 15s
+    dns_sd_configs:
+      - names:
+          - "tasks.apiinsights"
+        type: "A"
+        port: 80
+
+  # Scrape Prometheus itself every 5 seconds.
+  - job_name: "prometheus"
+    scrape_interval: 15s
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # Scrape consul
+  - job_name: "consulserver"
+    metrics_path: /v1/agent/metrics
+    params:
+      format: ["prometheus"]
+    scrape_interval: 15s
+    static_configs:
+      - targets: ["consul.service:8500"]
+
+  # Scrape docker host
+  - job_name: "docker_host"
+    scrape_interval: 15s
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["host.docker.internal:9100"]
