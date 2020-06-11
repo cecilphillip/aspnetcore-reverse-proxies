@@ -1,9 +1,9 @@
 version: "3.7"
 
 services:
-  haproxy.service:
+  haproxy_service:
     image: haproxy:2.1.4
-    container_name: haproxy.service
+    container_name: haproxy_service
     restart: always
     ports:
       - "80:80"
@@ -11,7 +11,7 @@ services:
       - "443:443"
     volumes:
       - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
-  simplecoreapi.service:
+  simplecoreapi_service:
     build:
       context: ./api
       dockerfile: Dockerfile
