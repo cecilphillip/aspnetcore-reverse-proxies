@@ -1,0 +1,53 @@
+version: "3.7"
+services:
+  apiinsights:
+    build:
+      context: ./apiinsights
+      dockerfile: Dockerfile
+    volumes:
+      - ~/.aspnet/https:/https:ro
+    depends_on:
+      - consulservice
+
+  haproxy4consul:
+    image: haproxy:2.1.4
+    container_name: haproxy4consul_service
+    restart: always
+    ports:
+      - "80:80"
+      - "81:81" # web ui port
+      - "443:443"
+    volumes:
+      - ./haproxy4consul.cfg:/usr/local/etc/haproxy/haproxy.cfg
+    depends_on:
+      - apiinsights
+
+  consulservice:
+    container_name: consul_service
+    image: consul:1.7.3
+    restart: unless-stopped
+    ports:
+      - "8500:8500" # HTTP API and UI port
+      - "8600:8600/udp" # DNS Port
+    command: consul agent -dev -config-dir /etc/consul.d
+    volumes:
+      - ./consul.server.json:/etc/consul.d/consul.server.json
+
+  # prometheusservice:
+  #   container_name: prometheus_service
+  #   image: prom/prometheus:v2.18.1
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+  #   ports:
+  #     - "9090:9090"
+  #   command:
+  #     - "--config.file=/etc/prometheus/prometheus.yml"
+  #     - "--storage.tsdb.path=/prometheus"
+  #     - "--storage.tsdb.retention=200h"
+  #     - "--web.enable-lifecycle"
+
+networks:
+  default:
+    name: consul_haproxy.network
+    driver: bridge
