@@ -3,7 +3,7 @@ version: "3.7"
 services:
   nginx.service:
     image: nginx:1.19.0
-    container_name: nginx.service
+    container_name: nginx_service
     restart: always
     ports:
       - "80:80"
@@ -12,13 +12,13 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
       - ./nginx/conf.d/:/etc/nginx/conf.d/
-  simplecoreapi_a.service:
+  simplecoreapi_a_service:
     build:
       context: ./api
       dockerfile: Dockerfile
     volumes:
       - ~/.aspnet/https:/https:ro # local dev certificates
-  simplecoreapi_b.service:
+  simplecoreapi_b_service:
     build:
       context: ./api
       dockerfile: Dockerfile
@@ -26,5 +26,5 @@ services:
       - ~/.aspnet/https:/https:ro # local dev certificates
 networks:
   default:
-    name: nginx.network
+    name: nginx_network
     driver: bridge

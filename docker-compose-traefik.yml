@@ -25,7 +25,7 @@ services:
       - "8080:8080" # Web UI port
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock # So Traefik can listen to Docker events
-  simplecoreapi.service:    
+  simplecoreapi_service:
     build:
       context: ./api
       dockerfile: Dockerfile
