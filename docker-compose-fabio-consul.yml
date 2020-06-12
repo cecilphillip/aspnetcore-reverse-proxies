@@ -1,0 +1,40 @@
+version: "3.7"
+services:
+  apiinsights:
+    build:
+      context: ./apiinsights
+      dockerfile: Dockerfile
+    volumes:
+      - ~/.aspnet/https:/https:ro
+    depends_on:
+      - consulservice
+
+  fabio:
+    image: fabiolb/fabio:1.5.13-go1.13.4
+    container_name: fabio
+    restart: unless-stopped
+    environment:
+      - FABIO_REGISTRY_CONSUL_ADDR=consul_service:8500
+      - FABIO_PROXY_ADDR=:9999
+      - FABIO_PROXY_STRATEGY=rr
+    ports:
+      - 9998:9998
+      - 80:9999
+    depends_on:
+      - consulservice
+
+  consulservice:
+    container_name: consul_service
+    image: consul:1.7.3
+    restart: unless-stopped
+    ports:
+      - "8500:8500" # HTTP API and UI port
+      - "8600:8600/udp" # DNS Port
+    command: consul agent -dev -config-dir /etc/consul.d
+    volumes:
+      - ./consul.server.json:/etc/consul.d/consul.server.json
+
+networks:
+  default:
+    name: fabio_consul.network
+    driver: bridge
